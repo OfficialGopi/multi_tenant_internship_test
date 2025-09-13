@@ -25,18 +25,19 @@ model Tenant {
   isPro Boolean @default(false)
   slug String @unique
   totalNotes Int @default(0)
-  users User[]
+  users User[] 
   notes Note[]
 }
 
 model User {
   id String @unique @default(uuid())
+  name String
   email String @unique
   role Roles @default(MEMBER)
   password String
   token String?
-  tenantId String
-  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  tenantId String 
+  tenant  Tenant  @relation(fields: [tenantId], references: [id],onDelete: Cascade)
   notes Note[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -47,9 +48,9 @@ model Note {
   title String
   content String
   tenantId String
-  tenant Tenant @relation(fields: [tenantId],references: [id])
+  tenant Tenant @relation(fields: [tenantId],references: [id],onDelete: Cascade)
   creatorId String
-  creator User @relation(fields: [creatorId],references: [id])
+  creator User @relation(fields: [creatorId],references: [id],onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
