@@ -11,3 +11,13 @@ export const createTenantSchema = z.object({
   adminEmail: z.email(),
   adminPassword: z.string(),
 });
+
+export const createNotesSchema = z.object({
+  title: z.string(),
+  content: z.string(),
+});
+
+export const updateNotesSchema = z.object({
+  title: z.string().optional(),
+  content: z.string().optional(),
+});
