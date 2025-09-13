@@ -21,3 +21,9 @@ export const updateNotesSchema = z.object({
   title: z.string().optional(),
   content: z.string().optional(),
 });
+
+export const inviteMemberToTenantSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+  name: z.string(),
+});

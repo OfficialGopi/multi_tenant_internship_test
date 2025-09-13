@@ -273,6 +273,7 @@ async function DELETE(
       );
     }
     const user = req.user;
+
     if (!user) {
       return NextResponse.json(
         {
@@ -325,6 +326,17 @@ async function DELETE(
     await db.note.delete({
       where: {
         id: id,
+      },
+    });
+
+    await db.tenant.update({
+      where: {
+        id: user.tenantId,
+      },
+      data: {
+        totalNotes: {
+          decrement: 1,
+        },
       },
     });
 
