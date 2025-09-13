@@ -1,7 +1,8 @@
+import { checkUser } from "@/middlewares/checkUser";
 import { NextResponse } from "next/server";
 
 async function POST(req: Request) {
-  const user = req.user;
+  const user = await checkUser(req);
 
   if (!user) {
     return NextResponse.json(
@@ -30,3 +31,5 @@ async function POST(req: Request) {
     }
   );
 }
+
+export { POST };

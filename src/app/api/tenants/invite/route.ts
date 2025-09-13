@@ -3,9 +3,10 @@ import { inviteMemberToTenantSchema } from "@/schemas/schemas";
 import { hashPassword } from "@/utils/bcrypt";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { checkUser } from "@/middlewares/checkUser";
 async function POST(req: Request) {
   try {
-    const user = req.user;
+    const user = await checkUser(req);
 
     if (!user) {
       return NextResponse.json(

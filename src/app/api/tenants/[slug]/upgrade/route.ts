@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { Roles } from "@/generated/prisma";
+import { checkUser } from "@/middlewares/checkUser";
 
 async function POST(
   req: Request,
@@ -10,7 +11,7 @@ async function POST(
     params: Promise<{ slug: string }>;
   }
 ) {
-  const user = req.user;
+  const user = await checkUser(req);
 
   if (!user) {
     return NextResponse.json(

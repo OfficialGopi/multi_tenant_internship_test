@@ -1,11 +1,13 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { checkUser } from "@/middlewares/checkUser";
 
 async function DELETE(req: Request) {
+  const user = await checkUser(req);
   const cookiesStore = await cookies();
 
-  if (!req.user) {
+  if (!user) {
     cookiesStore.delete("access-token");
     cookiesStore.delete("refresh-token");
 
@@ -24,7 +26,7 @@ async function DELETE(req: Request) {
 
   await db.user.update({
     where: {
-      id: req.user.id,
+      id: user.id,
     },
     data: {
       token: null,
