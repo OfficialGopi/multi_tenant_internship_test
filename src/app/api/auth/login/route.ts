@@ -16,6 +16,7 @@ async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
+          success: false,
           message: "Both fields are required",
         },
         {
@@ -35,6 +36,7 @@ async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
+          success: false,
           message: "Invalid credentials",
         },
         {
@@ -51,6 +53,7 @@ async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
+          success: false,
           message: "Invalid credentials",
         },
         {
@@ -99,6 +102,7 @@ async function POST(req: Request) {
     return NextResponse.json(
       {
         status: "success",
+        success: true,
         message: "Login successful",
         data: {
           user: sanitizeUser(user),
@@ -113,6 +117,7 @@ async function POST(req: Request) {
     return NextResponse.json(
       {
         status: "error",
+        success: false,
         message: "Something went wrong",
       },
       {

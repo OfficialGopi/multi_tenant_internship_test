@@ -2,7 +2,6 @@ import { generateTokens, verifyToken } from "@/utils/jwt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { checkUser } from "@/middlewares/checkUser";
 async function PUT(req: Request) {
   try {
     const cookieStore = await cookies();

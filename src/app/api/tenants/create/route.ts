@@ -13,7 +13,28 @@ async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
-          message: "Both fields are required",
+          message: "All fields are required",
+          success: false,
+        },
+        {
+          status: 400,
+          statusText: "Bad Request",
+        }
+      );
+    }
+
+    const adminEmailCheck = await db.user.findUnique({
+      where: {
+        email: data.adminEmail,
+      },
+    });
+
+    if (adminEmailCheck) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "Email already exists",
+          success: false,
         },
         {
           status: 400,
@@ -42,6 +63,7 @@ async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
+          success: false,
           message: "Something went wrong",
         },
         {
@@ -68,6 +90,7 @@ async function POST(req: Request) {
           tenant: createdTenant,
           admin: createdAdmin,
         },
+        success: true,
       },
       {
         status: 200,
@@ -76,6 +99,7 @@ async function POST(req: Request) {
   } catch (error) {
     return NextResponse.json(
       {
+        success: false,
         status: "error",
         message: "Something went wrong",
       },

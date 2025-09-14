@@ -1,11 +1,7 @@
 import { env } from "./constants/env";
-import { PrismaClient } from "./generated/prisma/edge";
+import { PrismaClient } from "./generated/prisma";
 
-const prisma =
-  globalThis.db ??
-  new PrismaClient({
-    datasourceUrl: env.DATABASE_URL,
-  });
+const prisma = globalThis.db ?? new PrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalThis.db = prisma;

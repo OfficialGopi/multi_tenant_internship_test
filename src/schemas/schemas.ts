@@ -13,8 +13,8 @@ export const createTenantSchema = z.object({
 });
 
 export const createNotesSchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z.string().min(1),
+  content: z.string().min(1),
 });
 
 export const updateNotesSchema = z.object({
