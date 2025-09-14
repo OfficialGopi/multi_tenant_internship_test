@@ -186,6 +186,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       router.replace("/login");
     } catch (e) {
       router.replace("/login");
+    } finally {
+      toast.success("Logout successful");
     }
   };
 
