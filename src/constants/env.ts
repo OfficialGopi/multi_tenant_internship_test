@@ -8,7 +8,6 @@ export function parseEnv(env: NodeJS.ProcessEnv) {
     REFRESH_TOKEN_SECRET: z.string(),
     ACCESS_TOKEN_EXPIRY: z.string(),
     REFRESH_TOKEN_EXPIRY: z.string(),
-    BASE_URL: z.string(),
   });
 
   const { success, data, error } = envSchema.safeParse(env);
