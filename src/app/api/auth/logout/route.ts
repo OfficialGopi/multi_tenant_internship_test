@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { checkUser } from "@/middlewares/checkUser";
 
 async function DELETE(req: Request) {
-  const user = await checkUser(req);
+  const user = await checkUser();
   const cookiesStore = await cookies();
 
   if (!user) {

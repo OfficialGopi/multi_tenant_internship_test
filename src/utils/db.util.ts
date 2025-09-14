@@ -1,4 +1,4 @@
-import { User } from "@/generated/prisma";
+import { User } from "@/generated/prisma/client";
 
 function sanitizeUser(user: User) {
   const sanitizedUser = {

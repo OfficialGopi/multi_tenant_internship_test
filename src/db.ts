@@ -1,5 +1,4 @@
-import { env } from "./constants/env";
-import { PrismaClient } from "./generated/prisma";
+import { PrismaClient } from "./generated/prisma/client";
 
 const prisma = globalThis.db ?? new PrismaClient();
 

@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Delete, Edit, Edit2, Trash, Trash2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -17,12 +17,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { toast } from "sonner";
 import { useNotes } from "@/contexts/NotesContext";
 import { useUser } from "@/contexts/UserContext";
-import { Roles } from "@/generated/prisma";
+import { Roles } from "@/constants/roles.constant";
 
-const NoteCard = ({ note }: { note: any }) => {
+const NoteCard = ({
+  note,
+}: {
+  note: {
+    id: string;
+    title: string;
+    content: string;
+    updatedAt: string;
+    createdAt: string;
+    tenantId: string;
+    creatorId: string;
+    creator: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+}) => {
   const { user } = useUser();
   const { addOrUpdateNote, isNoteUpdating, isNoteDeleting, deleteNote } =
     useNotes();
@@ -62,7 +78,7 @@ const NoteCard = ({ note }: { note: any }) => {
         <CardFooter className="flex mt-2  w-full text-sm text-neutral-400  items-start flex-col">
           <span>Created by {note.creator.name}.</span>
           <span>Created at {new Date(note.createdAt).toDateString()}.</span>
-          {note.cretedAt !== note.updatedAt && (
+          {note.createdAt !== note.updatedAt && (
             <span>
               Last updated at {new Date(note.updatedAt).toDateString()}.
             </span>

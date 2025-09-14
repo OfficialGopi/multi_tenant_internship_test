@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { Roles } from "@/generated/prisma";
+import { Roles } from "@/generated/prisma/client";
 import { updateNotesSchema } from "@/schemas/schemas";
 import { checkUser } from "@/middlewares/checkUser";
 
@@ -15,7 +15,7 @@ async function GET(
   try {
     const { id } = await params;
 
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(
@@ -107,7 +107,7 @@ async function PUT(
   try {
     const { id } = await params;
 
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(
@@ -275,7 +275,7 @@ async function DELETE(
         }
       );
     }
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(

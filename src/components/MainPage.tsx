@@ -1,5 +1,4 @@
 "use client";
-import { Roles } from "@/generated/prisma";
 import { Loader2, LogOut, Plus, Rocket, UserPlus, Menu, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,6 +16,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useNotes } from "@/contexts/NotesContext";
 import UpgradeToProCard from "./UpgradeToProCard";
 import { cn } from "@/utils/cn";
+import { Roles } from "@/constants/roles.constant";
 
 const MainPage = () => {
   const [isUpgradingToProDialogOpen, setIsUpgradingToProDialogOpen] =
@@ -89,7 +89,7 @@ const MainPage = () => {
 
   useEffect(() => {
     getNotes();
-  }, []);
+  }, [getNotes]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="max-w-5xl mx-auto ">
@@ -633,17 +633,20 @@ const MainPage = () => {
           <></>
         ) : (
           notes.map(
-            (
-              note: {
+            (note: {
+              id: string;
+              title: string;
+              content: string;
+              updatedAt: string;
+              createdAt: string;
+              tenantId: string;
+              creatorId: string;
+              creator: {
                 id: string;
-                title: string;
-                content: string;
-                createdAt: Date;
-                updatedAt: Date;
-                tenantId: string;
-              },
-              idx: number
-            ) => {
+                name: string;
+                email: string;
+              };
+            }) => {
               return <NoteCard key={note.id} note={note} />;
             }
           )

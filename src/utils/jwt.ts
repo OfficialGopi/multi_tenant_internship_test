@@ -1,5 +1,5 @@
 import { env } from "@/constants/env";
-import { Roles } from "@/generated/prisma";
+import { Roles } from "@/constants/roles.constant";
 import jwt from "jsonwebtoken";
 
 function generateTokens(

@@ -2,7 +2,7 @@ import { createTenantSchema } from "@/schemas/schemas";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { hashPassword } from "@/utils/bcrypt";
-import { Roles } from "@/generated/prisma";
+import { Roles } from "@/generated/prisma/client";
 async function POST(req: Request) {
   try {
     const body = await req.json();

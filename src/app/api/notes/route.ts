@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { checkUser } from "@/middlewares/checkUser";
 async function POST(req: Request) {
   try {
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(
@@ -125,7 +125,7 @@ async function POST(req: Request) {
 export { POST };
 
 async function GET(req: Request) {
-  const user = await checkUser(req);
+  const user = await checkUser();
 
   if (!user) {
     return NextResponse.json(

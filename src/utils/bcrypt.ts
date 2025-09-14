@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 async function hashPassword(password: string) {
   try {
     return await bcrypt.hash(password, 10);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -11,7 +11,7 @@ async function hashPassword(password: string) {
 async function comparePassword(password: string, hashedPassword: string) {
   try {
     return await bcrypt.compare(password, hashedPassword);
-  } catch (error) {
+  } catch {
     return null;
   }
 }

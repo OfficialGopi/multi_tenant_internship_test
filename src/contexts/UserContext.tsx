@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 const UserContext = createContext<{
@@ -95,7 +95,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      let refreshAccessTokenResponse = await (
+      const refreshAccessTokenResponse = await (
         await fetch(`/api/auth/refresh-access-token`, {
           method: "PUT",
         })
@@ -118,7 +118,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setUser(undefined);
       }
-    } catch (error) {
+    } catch {
       setUser(undefined);
     } finally {
       setIsUserLoading(false);
@@ -140,7 +140,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setTenant(undefined);
       }
-    } catch (error) {
+    } catch {
       setTenant(undefined);
     } finally {
       setIsTenantLoading(false);
@@ -181,7 +181,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
           id: toastId,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong", {
         id: toastId,
       });
@@ -198,7 +198,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(undefined);
       setTenant(undefined);
       router.replace("/login");
-    } catch (e) {
+    } catch {
       router.replace("/login");
     } finally {
       toast.success("Logout successful");
@@ -236,7 +236,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
           id: toastId,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong", {
         id: toastId,
       });
@@ -262,7 +262,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await getUser();
       await getTenant();
       toast.success("Upgrade successful");
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
     } finally {
       setIsUpgradingToPro(false);

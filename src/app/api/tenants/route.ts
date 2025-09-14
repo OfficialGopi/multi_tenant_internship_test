@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 const GET = async (req: Request) => {
   try {
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(

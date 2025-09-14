@@ -2,10 +2,60 @@
 import { createContext, useContext, useState } from "react";
 import { toast } from "sonner";
 
-const NotesContext = createContext<any>(null);
+const NotesContext = createContext<{
+  notes: {
+    id: string;
+    title: string;
+    content: string;
+    updatedAt: string;
+    createdAt: string;
+    tenantId: string;
+    creatorId: string;
+    creator: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }[];
+  isNotesLoading: boolean;
+  isNoteDeleting: boolean;
+  isNoteAdding: boolean;
+  isNoteUpdating: boolean;
+  getNotes: () => Promise<void>;
+  addOrUpdateNote: (data: {
+    id?: string;
+    title: string;
+    content: string;
+  }) => Promise<void>;
+  deleteNote: ({ id }: { id: string }) => Promise<void>;
+}>({
+  notes: [],
+  isNotesLoading: false,
+  isNoteDeleting: false,
+  isNoteAdding: false,
+  isNoteUpdating: false,
+  getNotes: async () => {},
+  addOrUpdateNote: async () => {},
+  deleteNote: async ({}) => {},
+});
 
 const NotesProvider = ({ children }: { children: React.ReactNode }) => {
-  const [notes, setNotes] = useState<any[]>([]);
+  const [notes, setNotes] = useState<
+    {
+      id: string;
+      title: string;
+      content: string;
+      updatedAt: string;
+      createdAt: string;
+      tenantId: string;
+      creatorId: string;
+      creator: {
+        id: string;
+        name: string;
+        email: string;
+      };
+    }[]
+  >([]);
   const [isNotesLoading, setIsNotesLoading] = useState(false);
   const [isNoteDeleting, setIsNoteDeleting] = useState(false);
   const [isNoteAdding, setIsNoteAdding] = useState(false);
@@ -84,7 +134,7 @@ const NotesProvider = ({ children }: { children: React.ReactNode }) => {
           id: toastId,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong", {
         id: toastId,
       });
@@ -108,7 +158,7 @@ const NotesProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setNotes([]);
       }
-    } catch (error) {
+    } catch {
       setNotes([]);
     } finally {
       setIsNotesLoading(false);
@@ -136,7 +186,7 @@ const NotesProvider = ({ children }: { children: React.ReactNode }) => {
           id: toastId,
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong", {
         id: toastId,
       });

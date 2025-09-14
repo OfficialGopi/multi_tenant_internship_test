@@ -1,4 +1,4 @@
-import { Roles } from "@/generated/prisma";
+import { Roles } from "@/generated/prisma/client";
 import { inviteMemberToTenantSchema } from "@/schemas/schemas";
 import { hashPassword } from "@/utils/bcrypt";
 import { NextResponse } from "next/server";
@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { checkUser } from "@/middlewares/checkUser";
 async function POST(req: Request) {
   try {
-    const user = await checkUser(req);
+    const user = await checkUser();
 
     if (!user) {
       return NextResponse.json(

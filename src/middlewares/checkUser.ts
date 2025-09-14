@@ -1,9 +1,8 @@
 import { sanitizeUser } from "@/utils/db.util";
 import { verifyToken } from "@/utils/jwt";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { db } from "@/db";
-async function checkUser(req: Request) {
+async function checkUser() {
   try {
     const cookiesStore = await cookies();
 
@@ -32,7 +31,7 @@ async function checkUser(req: Request) {
     }
 
     return sanitizeUser(user);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
