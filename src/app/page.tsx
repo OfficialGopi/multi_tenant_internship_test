@@ -1,15 +1,11 @@
 "use client";
 import MainPage from "@/components/MainPage";
 import { useUser } from "@/contexts/UserContext";
-import { getUser } from "@/services/api.services";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Home = () => {
-  const router = useRouter();
-  const { user, getUser, isUserLoading, isTenantLoading, getTenant, tenant } =
-    useUser();
+  const { user, getUser, isUserLoading, getTenant } = useUser();
 
   useEffect(() => {
     if (!user) {

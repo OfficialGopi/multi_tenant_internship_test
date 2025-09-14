@@ -15,13 +15,26 @@ import {
 import NoteCard from "./NoteCard";
 import { useUser } from "@/contexts/UserContext";
 import { useNotes } from "@/contexts/NotesContext";
+import UpgradeToProCard from "./UpgradeToProCard";
 
 const MainPage = () => {
+  const [isUpgradingToProDialogOpen, setIsUpgradingToProDialogOpen] =
+    useState(false);
   const [isNoteCreateDialogOpen, setIsNoteCreateDialogOpen] = useState(false);
   const [isInviteMemberDialogOpen, setIsInviteMemberDialogOpen] =
     useState(false);
+  const [isUpgradeToProCardOpen, setIsUpgradeToProCardOpen] = useState(true);
 
-  const { user, logoutUser, inviteMember, isInviteMemberLoading } = useUser();
+  const {
+    user,
+    logoutUser,
+    inviteMember,
+    isInviteMemberLoading,
+    isUpgradingToPro,
+    upgradeToPro,
+    tenant,
+    isTenantLoading,
+  } = useUser();
   const { notes, addOrUpdateNote, isNoteAdding, getNotes, isNotesLoading } =
     useNotes();
   const [formData, setFormData] = useState({
@@ -66,23 +79,77 @@ const MainPage = () => {
     });
   };
 
+  const handleUpgradeToPro = async () => {
+    await upgradeToPro();
+    setIsUpgradingToProDialogOpen(false);
+  };
+
   useEffect(() => {
     getNotes();
   }, []);
 
   return (
     <div className="max-w-5xl mx-auto ">
-      <nav className="py-2 flex items-center justify-between border-b border-neutral-500/50 w-full gap-5">
+      {!tenant?.isPro && notes.length === 3 && (
+        <UpgradeToProCard
+          isDialogOpen={isUpgradeToProCardOpen}
+          setIsDialogOpen={setIsUpgradeToProCardOpen}
+        />
+      )}
+      <nav className="py-2 flex items-center justify-between border-b border-neutral-500/50 w-full gap-5 sticky top-0  bg-neutral-950/50 backdrop-blur-2xl">
         <h1 className="text-2xl font-semibold ">Notes</h1>
         <div className="flex items-center justify-center gap-5">
-          {user?.role === Roles.ADMIN && (
-            <button className="flex items-center gap-1 justify-center cursor-pointer text-sm hover:text-neutral-300 transition-[transform_color] group border p-2 border-neutral-500/50 rounded-md pr-4">
-              <Rocket className="w-5 h-5" />
-              <span className="group-hover:translate-x-[5px] transition-[transform_color]">
-                Upgrade to pro
-              </span>
-            </button>
+          {isTenantLoading ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <>
+              {user?.role === Roles.ADMIN && !tenant?.isPro && (
+                <Dialog
+                  open={isUpgradingToProDialogOpen}
+                  onOpenChange={setIsUpgradingToProDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <button className="flex items-center gap-1 justify-center cursor-pointer text-sm hover:text-neutral-300 transition-[transform_color] group border p-2 border-neutral-500/50 rounded-md pr-4">
+                      <Rocket className="w-5 h-5" />
+                      <span className="group-hover:translate-x-[5px] transition-[transform_color]">
+                        Upgrade to pro
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Upgrade to pro</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to upgrade this tenant to pro?
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
+                          Cancel
+                        </button>
+                      </DialogClose>
+                      <button
+                        className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
+                        onClick={handleUpgradeToPro}
+                        disabled={isUpgradingToPro}
+                      >
+                        {isUpgradingToPro ? "Upgrading..." : "Upgrade"}
+                      </button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {tenant?.isPro && (
+                <div className="flex items-center gap-1 justify-center  text-sm  border p-2 border-neutral-500/50 rounded-md pr-4">
+                  <Rocket className="w-5 h-5" />
+                  <span className=" ">You are a pro</span>
+                </div>
+              )}
+            </>
           )}
+
           {user?.role === Roles.ADMIN && (
             <Dialog
               open={isInviteMemberDialogOpen}

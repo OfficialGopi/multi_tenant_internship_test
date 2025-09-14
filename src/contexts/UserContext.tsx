@@ -31,6 +31,8 @@ const UserContext = createContext<{
     password: string;
   }) => Promise<void>;
   isInviteMemberLoading: boolean;
+  isUpgradingToPro: boolean;
+  upgradeToPro: () => Promise<void>;
 }>({
   user: undefined,
   getUser: async () => {},
@@ -43,6 +45,8 @@ const UserContext = createContext<{
   logoutUser: async () => {},
   inviteMember: async () => {},
   isInviteMemberLoading: false,
+  isUpgradingToPro: false,
+  upgradeToPro: async () => {},
 });
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -63,6 +67,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isUserLoggingIn, setIsUserLoggingIn] = useState(false);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
   const [isInviteMemberLoading, setIsInviteMemberLoading] = useState(false);
+  const [isUpgradingToPro, setIsUpgradingToPro] = useState(false);
   const [tenant, setTenant] = useState<
     | {
         id: string;
@@ -240,6 +245,30 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const upgradeToPro = async () => {
+    setIsUpgradingToPro(true);
+    if (!tenant || !user) {
+      toast.error("Something went wrong");
+      return;
+    }
+    if (tenant.isPro) {
+      toast.info("You are already a pro user");
+      return;
+    }
+    try {
+      await fetch(`/api/tenants/${tenant?.slug}/upgrade`, {
+        method: "POST",
+      });
+      await getUser();
+      await getTenant();
+      toast.success("Upgrade successful");
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setIsUpgradingToPro(false);
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -254,6 +283,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isUserLoggingIn,
         inviteMember,
         isInviteMemberLoading,
+        upgradeToPro,
+        isUpgradingToPro,
       }}
     >
       {children}
@@ -275,6 +306,8 @@ export const useUser = (): {
   isTenantLoading: boolean;
   isUserLoggingIn: boolean;
   logoutUser: () => Promise<void>;
+  upgradeToPro: () => Promise<void>;
+  isUpgradingToPro: boolean;
   tenant?: {
     id: string;
     name: string;

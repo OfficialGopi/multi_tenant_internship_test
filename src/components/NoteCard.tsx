@@ -59,12 +59,18 @@ const NoteCard = ({ note }: { note: any }) => {
           <CardTitle className="text-2xl">{note.title}</CardTitle>
         </CardHeader>
         <CardContent className="text-lg">{note.content}</CardContent>
-        <CardFooter className="flex items-center  w-full text-sm text-neutral-400">
-          Created by {note.creator.name}
+        <CardFooter className="flex items-center  w-full text-sm text-neutral-400  gap-4">
+          <span>Created by {note.creator.name}.</span>
+          <span>Created at {new Date(note.createdAt).toDateString()}.</span>
+          {note.cretedAt !== note.updatedAt && (
+            <span>
+              Last updated at {new Date(note.updatedAt).toDateString()}.
+            </span>
+          )}
         </CardFooter>
       </div>
       <div className="flex flex-col gap-2">
-        {user?.role === Roles.ADMIN && (
+        {(user?.role === Roles.ADMIN || user?.id === note.creator.id) && (
           <Dialog
             open={isUpdateDialogOpen}
             onOpenChange={setIsUpdateDialogOpen}
