@@ -2,42 +2,22 @@
 
 A secure, multi-tenant SaaS application for managing notes with role-based access control and subscription-based feature gating. Built with Next.js, Prisma, PostgreSQL, and deployed on Vercel.
 
-## 🏗️ Architecture
+## 🏗️ Multi-Tenancy
 
-### Multi-Tenancy Approach
+**Approach**: Shared schema with tenant ID column
 
-This application uses a **shared schema with tenant ID column** approach for multi-tenancy. All data is stored in a single PostgreSQL database with strict tenant isolation enforced at the application level through `tenantId` foreign keys.
+- Single PostgreSQL database with `tenantId` foreign keys
+- Strict tenant isolation enforced at application level
+- All queries filtered by `tenantId` for data separation
 
-**Benefits:**
+## 🔐 Authentication & Test Accounts
 
-- Cost-effective for smaller applications
-- Easier to maintain and backup
-- Simplified analytics and reporting
-- Single database connection management
+**JWT-based authentication** with HTTP-only cookies
 
-**Data Isolation:**
+- Access Token: 24 hours
+- Refresh Token: 7 days
 
-- All queries include `tenantId` filtering
-- JWT tokens contain tenant information
-- Middleware validates tenant access on every request
-- Strict role-based access control within tenant boundaries
-
-## 🔐 Authentication & Authorization
-
-### JWT-Based Authentication
-
-- **Access Token**: Short-lived (24 hours), stored in HTTP-only cookies
-- **Refresh Token**: Long-lived (7 days), stored in HTTP-only cookies
-- **Token Validation**: Middleware checks tokens on protected routes
-
-### User Roles
-
-- **Admin**: Can invite users, upgrade subscriptions, manage all notes
-- **Member**: Can create, view, edit, and delete their own notes
-
-### Test Accounts
-
-All accounts use password: `password`
+### Test Accounts (Password: `password`)
 
 | Email             | Role   | Tenant |
 | ----------------- | ------ | ------ |
@@ -46,19 +26,15 @@ All accounts use password: `password`
 | admin@globex.test | Admin  | Globex |
 | user@globex.test  | Member | Globex |
 
+**Roles:**
+
+- **Admin**: Invite users, upgrade subscriptions, manage all notes
+- **Member**: Create, view, edit, delete own notes
+
 ## 💳 Subscription Plans
 
-### Free Plan
-
-- **Note Limit**: 3 notes maximum
-- **Features**: Basic CRUD operations
-- **Upgrade Prompt**: Shown when limit reached
-
-### Pro Plan
-
-- **Note Limit**: Unlimited
-- **Features**: All Free plan features + unlimited notes
-- **Upgrade**: Instant via admin upgrade endpoint
+- **Free Plan**: 3 notes maximum
+- **Pro Plan**: Unlimited notes (upgrade via admin endpoint)
 
 ## 🚀 API Endpoints
 
@@ -68,247 +44,81 @@ All accounts use password: `password`
 GET /api/health
 ```
 
-**Response:**
-
-```json
-{
-  "status": "ok"
-}
-```
+Response: `{"status": "ok"}`
 
 ### Authentication
 
 ```http
 POST /api/auth/login
-```
-
-**Request Body:**
-
-```json
-{
-  "email": "admin@acme.test",
-  "password": "password"
-}
-```
-
-```http
 POST /api/auth/me
-```
-
-**Headers:** `Cookie: access-token=<token>`
-
-```http
 POST /api/auth/logout
-```
-
-```http
 POST /api/auth/refresh-access-token
 ```
 
-### Notes Management
+### Notes (CRUD)
 
 ```http
-POST /api/notes
-```
-
-**Request Body:**
-
-```json
-{
-  "title": "My Note",
-  "content": "Note content here"
-}
-```
-
-```http
-GET /api/notes
-```
-
-**Returns:** All notes for the authenticated user's tenant
-
-```http
-GET /api/notes/:id
-```
-
-**Returns:** Specific note (tenant-isolated)
-
-```http
-PUT /api/notes/:id
-```
-
-**Request Body:**
-
-```json
-{
-  "title": "Updated Title",
-  "content": "Updated content"
-}
-```
-
-```http
-DELETE /api/notes/:id
+POST /api/notes          # Create note
+GET /api/notes           # List all notes (tenant-isolated)
+GET /api/notes/:id       # Get specific note
+PUT /api/notes/:id       # Update note
+DELETE /api/notes/:id    # Delete note
 ```
 
 ### Tenant Management
 
 ```http
-POST /api/tenants/create
+POST /api/tenants/create           # Create new tenant
+GET /api/tenants                   # Get current tenant info
+POST /api/tenants/:slug/upgrade    # Upgrade to Pro (Admin only)
+POST /api/tenants/invite           # Invite users (Admin only)
 ```
 
-**Request Body:**
+## 🛡️ Security
 
-```json
-{
-  "tenantName": "New Company",
-  "adminName": "Admin User",
-  "adminEmail": "admin@newcompany.com",
-  "adminPassword": "password123"
-}
-```
+- **Tenant Isolation**: All data filtered by `tenantId`
+- **Role-Based Access**: Admin vs Member permissions
+- **Data Protection**: bcrypt password hashing, secure cookies
+- **CORS**: Enabled for external API access
 
-```http
-GET /api/tenants
-```
+## 🎨 Frontend
 
-**Returns:** Current tenant information
-
-```http
-POST /api/tenants/:slug/upgrade
-```
-
-**Access:** Admin only
-**Upgrades tenant to Pro plan**
-
-```http
-POST /api/tenants/invite
-```
-
-**Access:** Admin only
-**Invites new users to tenant**
-
-## 🛡️ Security Features
-
-### Tenant Isolation
-
-- All database queries filtered by `tenantId`
-- JWT tokens contain tenant information
-- Middleware validates tenant access
-- No cross-tenant data access possible
-
-### Role-Based Access Control
-
-- Admin: Full access to tenant management
-- Member: Limited to own notes
-- Authorization checks on every protected endpoint
-
-### Data Protection
-
-- Passwords hashed with bcrypt
-- HTTP-only cookies for token storage
-- Secure cookie settings (SameSite, Secure)
-- Input validation with Zod schemas
-
-## 🎨 Frontend Features
-
-### Login System
-
-- Secure authentication form
-- Role-based dashboard access
-- Session management
-
-### Notes Management
-
-- Create, read, update, delete notes
-- Real-time note count tracking
-- Tenant-isolated note display
-
-### Subscription Management
-
-- Free plan limit enforcement
+- Login system with test accounts
+- Notes management (CRUD operations)
+- Subscription limit enforcement
 - "Upgrade to Pro" prompts
-- Admin upgrade functionality
-
-### Responsive Design
-
-- Modern UI with Tailwind CSS
-- Mobile-friendly interface
-- Clean, intuitive user experience
+- Responsive design with Tailwind CSS
 
 ## 🚀 Deployment
 
-### Vercel Configuration
+**Vercel** with PostgreSQL database
 
-- **Frontend**: Next.js application
-- **Backend**: API routes in `/api`
-- **Database**: PostgreSQL (Vercel Postgres)
-- **CORS**: Enabled for external access
-
-### Environment Variables
-
-```env
-DATABASE_URL=postgresql://...
-NODE_ENV=production
-ACCESS_TOKEN_SECRET=your-secret
-REFRESH_TOKEN_SECRET=your-secret
-ACCESS_TOKEN_EXPIRY=24h
-REFRESH_TOKEN_EXPIRY=7d
-```
+- Frontend: Next.js application
+- Backend: API routes in `/api`
+- CORS enabled for automated testing
 
 ## 🧪 Testing
 
-The application is designed to work with automated test scripts that verify:
+Automated test scripts verify:
 
-1. **Health endpoint availability**
-2. **Authentication for all test accounts**
-3. **Tenant isolation enforcement**
-4. **Role-based access restrictions**
-5. **Free plan note limits**
-6. **Pro plan upgrade functionality**
-7. **CRUD operations on notes**
-8. **Frontend accessibility**
+1. Health endpoint availability
+2. Authentication for all test accounts
+3. Tenant isolation enforcement
+4. Role-based access restrictions
+5. Free plan note limits (3 max)
+6. Pro plan upgrade functionality
+7. All CRUD operations
+8. Frontend accessibility
 
-## 📊 Database Schema
-
-### Core Models
-
-- **Tenant**: Company/organization data
-- **User**: User accounts with roles
-- **Note**: Individual notes with tenant isolation
-
-### Key Relationships
-
-- Tenant → Users (1:many)
-- Tenant → Notes (1:many)
-- User → Notes (1:many, creator relationship)
-
-## 🔧 Technology Stack
+## 🔧 Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **Backend**: Next.js API Routes
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT with HTTP-only cookies
+- **Auth**: JWT with HTTP-only cookies
 - **Styling**: Tailwind CSS
 - **Deployment**: Vercel
-- **Validation**: Zod schemas
-
-## 📝 Usage Instructions
-
-1. **Login**: Use any of the provided test accounts
-2. **Create Notes**: Start creating notes (Free plan: 3 max)
-3. **Upgrade**: Admin users can upgrade to Pro plan
-4. **Manage**: Full CRUD operations on notes
-5. **Invite**: Admins can invite new team members
-
-## 🔒 Security Considerations
-
-- All API endpoints require authentication
-- Tenant isolation enforced at database level
-- Role-based permissions on all operations
-- Secure token storage and validation
-- Input sanitization and validation
-- CORS properly configured for external access
 
 ---
 
 **Live Demo**: [Your Vercel Deployment URL]
-**Repository**: [Your GitHub Repository URL]
