@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { Roles } from "@/generated/prisma/client";
 import { updateNotesSchema } from "@/schemas/schemas";
 import { checkUser } from "@/middlewares/checkUser";
+import { env } from "@/constants/env";
 
 async function GET(
   req: Request,
@@ -85,6 +86,7 @@ async function GET(
       {
         status: "error",
         success: false,
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
         message: "Something went wrong",
       },
       {
@@ -207,10 +209,10 @@ async function PUT(
     } = {};
 
     if (body.title) {
-      updateDataField.title = body.title;
+      updateDataField.title = data.title;
     }
     if (body.content) {
-      updateDataField.content = body.content;
+      updateDataField.content = data.content;
     }
 
     const updatedNote = await db.note.update({
@@ -241,6 +243,7 @@ async function PUT(
       {
         status: "error",
         success: false,
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
         message: "Something went wrong",
       },
       {
@@ -360,6 +363,7 @@ async function DELETE(
         status: "error",
         success: false,
         message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 500,

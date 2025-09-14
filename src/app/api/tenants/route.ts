@@ -1,6 +1,7 @@
 import { checkUser } from "@/middlewares/checkUser";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { env } from "@/constants/env";
 const GET = async (req: Request) => {
   try {
     const user = await checkUser();
@@ -38,6 +39,7 @@ const GET = async (req: Request) => {
         status: "error",
         success: false,
         message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 500,

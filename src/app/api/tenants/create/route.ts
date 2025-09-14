@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { hashPassword } from "@/utils/bcrypt";
 import { Roles } from "@/generated/prisma/client";
+import { env } from "@/constants/env";
 async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -102,6 +103,7 @@ async function POST(req: Request) {
         success: false,
         status: "error",
         message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 500,

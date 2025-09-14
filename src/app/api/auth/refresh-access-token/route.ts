@@ -2,6 +2,7 @@ import { generateTokens, verifyToken } from "@/utils/jwt";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { env } from "@/constants/env";
 async function PUT(req: Request) {
   try {
     const cookieStore = await cookies();
@@ -94,6 +95,7 @@ async function PUT(req: Request) {
         status: "error",
         success: false,
         message: "Please Login again",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 401,

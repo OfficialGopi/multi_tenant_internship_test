@@ -2,6 +2,7 @@ import { createNotesSchema } from "@/schemas/schemas";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { checkUser } from "@/middlewares/checkUser";
+import { env } from "@/constants/env";
 async function POST(req: Request) {
   try {
     const user = await checkUser();
@@ -125,38 +126,53 @@ async function POST(req: Request) {
 export { POST };
 
 async function GET(req: Request) {
-  const user = await checkUser();
+  try {
+    const user = await checkUser();
 
-  if (!user) {
+    if (!user) {
+      return NextResponse.json(
+        {
+          status: "error",
+          success: false,
+          message: "Please Login again",
+        },
+        {
+          status: 401,
+          statusText: "Unauthorized",
+        }
+      );
+    }
+
+    const notes = await db.note.findMany({
+      where: {
+        tenantId: user.tenantId,
+      },
+      include: {
+        creator: true,
+      },
+    });
+
+    return NextResponse.json({
+      status: "ok",
+      success: true,
+      data: {
+        notes: notes,
+      },
+    });
+  } catch (error) {
     return NextResponse.json(
       {
         status: "error",
         success: false,
-        message: "Please Login again",
+        message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
-        status: 401,
-        statusText: "Unauthorized",
+        status: 500,
+        statusText: "Internal Server Error",
       }
     );
   }
-
-  const notes = await db.note.findMany({
-    where: {
-      tenantId: user.tenantId,
-    },
-    include: {
-      creator: true,
-    },
-  });
-
-  return NextResponse.json({
-    status: "ok",
-    success: true,
-    data: {
-      notes: notes,
-    },
-  });
 }
 
 export { GET };

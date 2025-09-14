@@ -4,6 +4,7 @@ import { hashPassword } from "@/utils/bcrypt";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { checkUser } from "@/middlewares/checkUser";
+import { env } from "@/constants/env";
 async function POST(req: Request) {
   try {
     const user = await checkUser();
@@ -90,6 +91,7 @@ async function POST(req: Request) {
       {
         status: "error",
         message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 500,
