@@ -2,8 +2,8 @@ import { PrismaClient } from "./generated/prisma/client";
 
 const prisma = globalThis.db ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.db = prisma;
-}
+// if (process.env.NODE_ENV !== "production") {
+globalThis.db = prisma;
+// }
 
 export const db = prisma;

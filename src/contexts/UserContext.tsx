@@ -256,7 +256,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     try {
-      await fetch(`/api/tenants/${tenant?.slug}/upgrade`, {
+      await fetch(`/api/tenants/${tenant.slug}/upgrade`, {
         method: "POST",
       });
       await getUser();
