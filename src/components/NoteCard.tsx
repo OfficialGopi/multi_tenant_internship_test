@@ -19,8 +19,11 @@ import {
 } from "./ui/dialog";
 import { toast } from "sonner";
 import { useNotes } from "@/contexts/NotesContext";
+import { useUser } from "@/contexts/UserContext";
+import { Roles } from "@/generated/prisma";
 
 const NoteCard = ({ note }: { note: any }) => {
+  const { user } = useUser();
   const { addOrUpdateNote, isNoteUpdating, isNoteDeleting, deleteNote } =
     useNotes();
 
@@ -61,96 +64,106 @@ const NoteCard = ({ note }: { note: any }) => {
         </CardFooter>
       </div>
       <div className="flex flex-col gap-2">
-        <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>
-          <DialogTrigger asChild>
-            <button className="border p-2 rounded-2xl">
-              <Edit2 className="w-5 h-5" />
-            </button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit the Note</DialogTitle>
-              <DialogDescription>
-                Edit the note . You can edit the title, content and it will be
-                saved to your tenant.
-              </DialogDescription>
-            </DialogHeader>
-            <form className="flex flex-col gap-2">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="title">Title</label>
-                <input
-                  type="text"
-                  className="p-2 border border-neutral-500/50 rounded-lg text-sm"
-                  placeholder="Enter the note title"
-                  value={formData.title}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      title: e.target.value,
-                    });
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="Content">Content</label>
-                <textarea
-                  className="p-2 border border-neutral-500/50 rounded-lg text-sm"
-                  placeholder="Enter the note content"
-                  value={formData.content}
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      content: e.target.value,
-                    });
-                  }}
-                />
-              </div>
-            </form>
-            <DialogFooter>
-              <DialogClose asChild>
-                <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
-                  Close
-                </button>
-              </DialogClose>
-              <button
-                className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
-                onClick={handleEditNote}
-                disabled={isNoteUpdating}
-              >
-                {isNoteUpdating ? "Saving..." : "Save"}
+        {user?.role === Roles.ADMIN && (
+          <Dialog
+            open={isUpdateDialogOpen}
+            onOpenChange={setIsUpdateDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <button className="border p-2 rounded-2xl">
+                <Edit2 className="w-5 h-5" />
               </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogTrigger asChild>
-            <button className="border p-2 rounded-2xl">
-              <Trash2 className="w-5 h-5" />
-            </button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete the Note</DialogTitle>
-              <DialogDescription>
-                Do you really want to delete the note?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <DialogClose asChild>
-                <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
-                  Close
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit the Note</DialogTitle>
+                <DialogDescription>
+                  Edit the note . You can edit the title, content and it will be
+                  saved to your tenant.
+                </DialogDescription>
+              </DialogHeader>
+              <form className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="title">Title</label>
+                  <input
+                    type="text"
+                    className="p-2 border border-neutral-500/50 rounded-lg text-sm"
+                    placeholder="Enter the note title"
+                    value={formData.title}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        title: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="Content">Content</label>
+                  <textarea
+                    className="p-2 border border-neutral-500/50 rounded-lg text-sm"
+                    placeholder="Enter the note content"
+                    value={formData.content}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        content: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
+              </form>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
+                    Close
+                  </button>
+                </DialogClose>
+                <button
+                  className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
+                  onClick={handleEditNote}
+                  disabled={isNoteUpdating}
+                >
+                  {isNoteUpdating ? "Saving..." : "Save"}
                 </button>
-              </DialogClose>
-              <button
-                className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
-                onClick={handleDeleteNote}
-                disabled={isNoteDeleting}
-              >
-                {isNoteDeleting ? "Deleting..." : "Delete"}
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+        {(user?.role === Roles.ADMIN || user?.id === note.creator.id) && (
+          <Dialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <button className="border p-2 rounded-2xl">
+                <Trash2 className="w-5 h-5" />
               </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete the Note</DialogTitle>
+                <DialogDescription>
+                  Do you really want to delete the note?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
+                    Close
+                  </button>
+                </DialogClose>
+                <button
+                  className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
+                  onClick={handleDeleteNote}
+                  disabled={isNoteDeleting}
+                >
+                  {isNoteDeleting ? "Deleting..." : "Delete"}
+                </button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </Card>
   );

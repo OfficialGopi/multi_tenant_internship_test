@@ -25,6 +25,12 @@ const UserContext = createContext<{
   loginUser: (data: { email: string; password: string }) => Promise<void>;
   getTenant: () => Promise<void>;
   logoutUser: () => Promise<void>;
+  inviteMember: (data: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
+  isInviteMemberLoading: boolean;
 }>({
   user: undefined,
   getUser: async () => {},
@@ -35,6 +41,8 @@ const UserContext = createContext<{
   getTenant: async () => {},
   isUserLoggingIn: true,
   logoutUser: async () => {},
+  inviteMember: async () => {},
+  isInviteMemberLoading: false,
 });
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +62,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isUserLoggingIn, setIsUserLoggingIn] = useState(false);
   const [isTenantLoading, setIsTenantLoading] = useState(true);
+  const [isInviteMemberLoading, setIsInviteMemberLoading] = useState(false);
   const [tenant, setTenant] = useState<
     | {
         id: string;
@@ -191,6 +200,46 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const inviteMember = async ({
+    name,
+    email,
+    password,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+  }) => {
+    setIsInviteMemberLoading(true);
+    const toastId = toast.loading("Inviting member...");
+    try {
+      const res = await (
+        await fetch(`/api/tenants/invite`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password }),
+        })
+      ).json();
+
+      if (res.success) {
+        toast.success(res.message, {
+          id: toastId,
+        });
+      } else {
+        toast.error(res.message, {
+          id: toastId,
+        });
+      }
+    } catch (error) {
+      toast.error("Something went wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsInviteMemberLoading(false);
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -203,6 +252,8 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
         getUser,
         loginUser,
         isUserLoggingIn,
+        inviteMember,
+        isInviteMemberLoading,
       }}
     >
       {children}
@@ -231,6 +282,12 @@ export const useUser = (): {
     slug: string;
     totalNotes: number;
   };
+  inviteMember: (data: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
+  isInviteMemberLoading: boolean;
   getTenant: () => Promise<void>;
 
   loginUser: (data: { email: string; password: string }) => Promise<void>;

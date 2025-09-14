@@ -1,6 +1,6 @@
 "use client";
 import { Roles } from "@/generated/prisma";
-import { Loader2, LogOut, Plus, Rocket } from "lucide-react";
+import { Loader2, LogOut, Plus, Rocket, UserPlus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -17,12 +17,22 @@ import { useUser } from "@/contexts/UserContext";
 import { useNotes } from "@/contexts/NotesContext";
 
 const MainPage = () => {
-  const { user, logoutUser } = useUser();
+  const [isNoteCreateDialogOpen, setIsNoteCreateDialogOpen] = useState(false);
+  const [isInviteMemberDialogOpen, setIsInviteMemberDialogOpen] =
+    useState(false);
+
+  const { user, logoutUser, inviteMember, isInviteMemberLoading } = useUser();
   const { notes, addOrUpdateNote, isNoteAdding, getNotes, isNotesLoading } =
     useNotes();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+  });
+
+  const [inviteData, setInviteData] = useState({
+    email: "",
+    password: "",
+    name: "",
   });
 
   const handleCreateNote = async (e: React.FormEvent) => {
@@ -31,10 +41,29 @@ const MainPage = () => {
       title: formData.title,
       content: formData.content,
     });
+    setFormData({
+      title: "",
+      content: "",
+    });
+    setIsNoteCreateDialogOpen(false);
   };
 
   const handleLogout = async () => {
     await logoutUser();
+  };
+  const handleInviteMember = async () => {
+    await inviteMember({
+      name: inviteData.name,
+      email: inviteData.email,
+      password: inviteData.password,
+    });
+
+    setIsInviteMemberDialogOpen(false);
+    setInviteData({
+      email: "",
+      password: "",
+      name: "",
+    });
   };
 
   useEffect(() => {
@@ -54,7 +83,95 @@ const MainPage = () => {
               </span>
             </button>
           )}
-          <Dialog>
+          {user?.role === Roles.ADMIN && (
+            <Dialog
+              open={isInviteMemberDialogOpen}
+              onOpenChange={setIsInviteMemberDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-1 justify-center cursor-pointer text-sm hover:text-neutral-300 transition-[transform_color] group border p-2 border-neutral-500/50 rounded-md pr-4">
+                  <UserPlus className="w-5 h-5" />
+                  <span className="group-hover:translate-x-[5px] transition-[transform_color]">
+                    Invite a member
+                  </span>
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Invite a member</DialogTitle>
+                  <DialogDescription>
+                    Invite a member to your tenant to collaborate on notes
+                  </DialogDescription>
+                </DialogHeader>
+                <form className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="name">Name</label>
+                    <input
+                      type="text"
+                      className="p-2 border border-neutral-500/50 rounded-lg text-sm"
+                      placeholder="Enter the note title"
+                      value={inviteData.name}
+                      onChange={(e) => {
+                        setInviteData({
+                          ...inviteData,
+                          name: e.target.value,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="email">Email</label>
+                    <input
+                      type="email"
+                      className="p-2 border border-neutral-500/50 rounded-lg text-sm"
+                      placeholder="Enter the note content"
+                      value={inviteData.email}
+                      onChange={(e) => {
+                        setInviteData({
+                          ...inviteData,
+                          email: e.target.value,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="password">Password</label>
+                    <input
+                      type="password"
+                      className="p-2 border border-neutral-500/50 rounded-lg text-sm"
+                      placeholder="Enter the note content"
+                      value={inviteData.password}
+                      onChange={(e) => {
+                        setInviteData({
+                          ...inviteData,
+                          password: e.target.value,
+                        });
+                      }}
+                    />
+                  </div>
+                </form>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <button className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-900/50 ">
+                      Close
+                    </button>
+                  </DialogClose>
+                  <button
+                    className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
+                    onClick={handleInviteMember}
+                    disabled={isInviteMemberLoading}
+                  >
+                    {isInviteMemberLoading ? "Inviting..." : "Invite"}
+                  </button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          <Dialog
+            open={isNoteCreateDialogOpen}
+            onOpenChange={setIsNoteCreateDialogOpen}
+          >
             <DialogTrigger asChild>
               <button className="flex items-center gap-1 justify-center cursor-pointer text-sm hover:text-neutral-300 transition-[transform_color] group border p-2 border-neutral-500/50 rounded-md pr-4">
                 <Plus className="w-5 h-5" />

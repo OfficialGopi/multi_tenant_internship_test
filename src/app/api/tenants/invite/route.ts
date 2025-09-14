@@ -83,6 +83,7 @@ async function POST(req: Request) {
       data: {
         user: addedUser,
       },
+      message: "Member invited successfully",
     });
   } catch (error) {
     return NextResponse.json(
@@ -97,3 +98,5 @@ async function POST(req: Request) {
     );
   }
 }
+
+export { POST };
