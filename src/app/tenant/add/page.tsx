@@ -69,7 +69,7 @@ const page = () => {
     return (
       <Loader2 className="animate-spin fixed top-[50%] left-[50%] translate-[-50%]" />
     );
-  if (user) {
+  else if (user) {
     return <Navigate to="/" />;
   } else
     return (

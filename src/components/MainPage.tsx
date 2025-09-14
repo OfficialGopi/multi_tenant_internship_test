@@ -89,7 +89,7 @@ const MainPage = () => {
 
   useEffect(() => {
     getNotes();
-  }, [getNotes]);
+  }, []);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="max-w-5xl mx-auto ">

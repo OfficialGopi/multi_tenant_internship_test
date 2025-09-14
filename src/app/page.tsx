@@ -2,7 +2,16 @@
 import MainPage from "@/components/MainPage";
 import { useUser } from "@/contexts/UserContext";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+
+const Navigate = ({ to }: { to: string }) => {
+  const router = useRouter();
+  useEffect(() => {
+    router.push(to);
+  }, []);
+  return <></>;
+};
 
 const Home = () => {
   const { user, getUser, isUserLoading, getTenant } = useUser();
@@ -18,7 +27,9 @@ const Home = () => {
     return (
       <Loader2 className="animate-spin fixed top-[50%] left-[50%] translate-[-50%]" />
     );
-  return <MainPage />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  } else return <MainPage />;
 };
 
 export default Home;
