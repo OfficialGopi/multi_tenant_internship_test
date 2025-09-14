@@ -59,7 +59,7 @@ const NoteCard = ({ note }: { note: any }) => {
           <CardTitle className="text-2xl">{note.title}</CardTitle>
         </CardHeader>
         <CardContent className="text-lg">{note.content}</CardContent>
-        <CardFooter className="flex items-center  w-full text-sm text-neutral-400  gap-4">
+        <CardFooter className="flex mt-2  w-full text-sm text-neutral-400  items-start flex-col">
           <span>Created by {note.creator.name}.</span>
           <span>Created at {new Date(note.createdAt).toDateString()}.</span>
           {note.cretedAt !== note.updatedAt && (
