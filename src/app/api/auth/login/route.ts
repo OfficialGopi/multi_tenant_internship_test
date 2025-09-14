@@ -5,6 +5,7 @@ import { comparePassword } from "@/utils/bcrypt";
 import { generateTokens } from "@/utils/jwt";
 import { cookies } from "next/headers";
 import { sanitizeUser } from "@/utils/db.util";
+import { env } from "@/constants/env";
 
 async function POST(req: Request) {
   try {
@@ -119,6 +120,7 @@ async function POST(req: Request) {
         status: "error",
         success: false,
         message: "Something went wrong",
+        error: env.NODE_ENV === "development" ? error : "Internal Server Error",
       },
       {
         status: 500,
