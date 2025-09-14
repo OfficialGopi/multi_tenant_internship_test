@@ -33,6 +33,9 @@ async function DELETE(req: Request) {
     },
   });
 
+  cookiesStore.delete("access-token");
+  cookiesStore.delete("refresh-token");
+
   return NextResponse.json(
     {
       status: "ok",

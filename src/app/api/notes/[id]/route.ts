@@ -52,7 +52,6 @@ async function GET(
       },
       include: {
         creator: true,
-        tenant: true,
       },
     });
     if (!note) {
@@ -219,6 +218,9 @@ async function PUT(
         id: id,
       },
       data: updateDataField,
+      include: {
+        creator: true,
+      },
     });
 
     return NextResponse.json(

@@ -1,7 +1,7 @@
 "use client";
 import { Roles } from "@/generated/prisma";
-import { LogOut, Plus, Rocket } from "lucide-react";
-import React, { useState } from "react";
+import { Loader2, LogOut, Plus, Rocket } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -12,66 +12,35 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { toast } from "sonner";
+import NoteCard from "./NoteCard";
+import { useUser } from "@/contexts/UserContext";
+import { useNotes } from "@/contexts/NotesContext";
 
-const MainPage = ({
-  user,
-  tenant,
-}: {
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    tenantId: string;
-  };
-  tenant: {
-    id: string;
-    name: string;
-    isPro: boolean;
-    slug: string;
-    totalNotes: number;
-  };
-}) => {
+const MainPage = () => {
+  const { user, logoutUser } = useUser();
+  const { notes, addOrUpdateNote, isNoteAdding, getNotes, isNotesLoading } =
+    useNotes();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
   });
 
-  const [isNoteCreating, setIsNoteCreating] = useState(false);
-
   const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsNoteCreating(true);
-    const toastId = toast.loading("Creating note...");
-    try {
-      const res = await (
-        await fetch("/api/notes", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        })
-      ).json();
-
-      if (res.success) {
-        toast.success("Note creation successful", {
-          id: toastId,
-        });
-      } else {
-        toast.error(res.message, {
-          id: toastId,
-        });
-      }
-    } catch (error) {
-      toast.error("Something went wrong", {
-        id: toastId,
-      });
-    } finally {
-      setIsNoteCreating(false);
-    }
+    await addOrUpdateNote({
+      title: formData.title,
+      content: formData.content,
+    });
   };
+
+  const handleLogout = async () => {
+    await logoutUser();
+  };
+
+  useEffect(() => {
+    getNotes();
+  }, []);
+
   return (
     <div className="max-w-5xl mx-auto ">
       <nav className="py-2 flex items-center justify-between border-b border-neutral-500/50 w-full gap-5">
@@ -139,14 +108,13 @@ const MainPage = ({
                     Close
                   </button>
                 </DialogClose>
-                <DialogClose asChild>
-                  <button
-                    className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
-                    onClick={handleCreateNote}
-                  >
-                    Save
-                  </button>
-                </DialogClose>
+                <button
+                  className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
+                  onClick={handleCreateNote}
+                  disabled={isNoteAdding}
+                >
+                  {isNoteAdding ? "Saving..." : "Save"}
+                </button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -176,7 +144,7 @@ const MainPage = ({
                 <DialogClose asChild>
                   <button
                     className="border p-2 border-neutral-500/50 rounded-md hover:bg-neutral-800 bg-neutral-900"
-                    onClick={handleCreateNote}
+                    onClick={handleLogout}
                   >
                     Logout
                   </button>
@@ -186,6 +154,29 @@ const MainPage = ({
           </Dialog>
         </div>
       </nav>
+      <div className="flex flex-col gap-2 mt-2">
+        {isNotesLoading ? (
+          <Loader2 className="animate-spin  mx-auto" />
+        ) : notes.length === 0 ? (
+          <></>
+        ) : (
+          notes.map(
+            (
+              note: {
+                id: string;
+                title: string;
+                content: string;
+                createdAt: Date;
+                updatedAt: Date;
+                tenantId: string;
+              },
+              idx: number
+            ) => {
+              return <NoteCard key={note.id} note={note} />;
+            }
+          )
+        )}
+      </div>
     </div>
   );
 };
