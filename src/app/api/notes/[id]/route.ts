@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { Roles } from "@/generated/prisma/client";
+import { Roles } from "@prisma/client";
 import { updateNotesSchema } from "@/schemas/schemas";
 import { checkUser } from "@/middlewares/checkUser";
 import { env } from "@/constants/env";

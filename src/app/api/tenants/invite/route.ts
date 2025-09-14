@@ -1,4 +1,4 @@
-import { Roles } from "@/generated/prisma/client";
+import { Roles } from "@prisma/client";
 import { inviteMemberToTenantSchema } from "@/schemas/schemas";
 import { hashPassword } from "@/utils/bcrypt";
 import { NextResponse } from "next/server";
